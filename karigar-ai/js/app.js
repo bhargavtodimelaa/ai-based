@@ -569,7 +569,25 @@ const App = {
         document.addEventListener('touchend', () => isDragging = false);
     },
 
-    enhanceImage() {
+    async enhanceImage() {
+        const photo = this.productCreationFlow.photo;
+        // Try API enhance if we have a real uploaded file
+        if (this._apiAvailable && photo && photo !== 'demo' && !photo.startsWith('data:')) {
+            try {
+                this.showAIProcessing([I18N.t('analyzing'), I18N.t('removingBg'), I18N.t('improvingLight'), I18N.t('preparingImage')], async () => {
+                    const result = await API.images.enhance(photo);
+                    this.productCreationFlow.enhanced = true;
+                    this.productCreationFlow.photo = result.enhanced_path;
+                    const after = document.getElementById('compare-after');
+                    if (after) after.innerHTML = `<div style="text-align:center"><div style="font-size:4rem;margin-bottom:var(--space-2)">✨🧶✨</div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold);color:#fff">Enhanced</div></div>`;
+                    const cs = document.querySelector('.compare-slider');
+                    if (cs) cs.style.boxShadow = '0 0 0 4px var(--success)';
+                    this.showToast('Image enhanced with AI!', 'success');
+                });
+                return;
+            } catch { /* fall through to mock */ }
+        }
+        // Mock fallback
         this.showAIProcessing([I18N.t('analyzing'), I18N.t('removingBg'), I18N.t('improvingLight'), I18N.t('preparingImage')], () => {
             this.productCreationFlow.enhanced = true;
             const after = document.getElementById('compare-after');
@@ -869,7 +887,7 @@ const App = {
             status: 'published',
             emoji: flow.listing?.emoji || '📦',
             description: flow.listing?.description || 'A beautiful handcrafted product.',
-            material: 'Mixed', craftType: 'Handmade',
+            material: 'Mixed', craft_type: 'Handmade',
             keywords: flow.listing?.keywords || [],
             languages: flow.listing?.languages || ['English'],
         };

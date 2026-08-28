@@ -10,7 +10,7 @@ Endpoints:
 """
 
 import os
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Query, Body
 from fastapi.responses import FileResponse
 from pathlib import Path
 from typing import Optional
@@ -105,7 +105,7 @@ async def enhance_image(request: EnhanceRequest):
 
 
 @router.post("/remove-bg", response_model=EnhanceResponse)
-async def remove_background(image_path: str = Form(...)):
+async def remove_background(image_path: str = Body(...)):
     """Remove background from an image (shortcut endpoint)."""
 
     if not os.path.exists(image_path):
@@ -122,7 +122,7 @@ async def remove_background(image_path: str = Form(...)):
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_image(image_path: str = Form(...)):
+async def analyze_image(image_path: str = Body(...)):
     """AI analysis of a product image - suggests category, quality, improvements."""
 
     if not os.path.exists(image_path):
