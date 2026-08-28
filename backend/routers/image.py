@@ -1,16 +1,15 @@
 """
-KarigarAI - Image Router
+KarigarAI - Image Router (v2)
 
 Endpoints:
-- POST /api/images/upload         - Upload a product image
-- POST /api/images/enhance        - AI-enhance an uploaded image
-- POST /api/images/remove-bg      - Remove background
-- POST /api/images/analyze        - AI analysis of product image
-- GET  /api/images/{filename}     - Serve uploaded/enhanced images
+- POST /api/images/upload         - Upload image → returns URL
+- POST /api/images/enhance        - Enhance image → returns before/after URLs
+- POST /api/images/analyze        - ML analysis → returns scores & suggestions
+- GET  /api/images/{filename}     - Serve any image file
 """
 
 import os
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Query, Body
+from fastapi import APIRouter, UploadFile, File, HTTPException, Body
 from fastapi.responses import FileResponse
 from pathlib import Path
 from typing import Optional
@@ -33,66 +32,74 @@ class EnhanceRequest(BaseModel):
     enhance_quality: bool = True
 
 
+class UploadResponse(BaseModel):
+    filename: str
+    path: str
+    url: str
+    size_bytes: int
+    width: int = 0
+    height: int = 0
+
+
 class EnhanceResponse(BaseModel):
-    original_path: str
-    enhanced_path: str
+    original_url: str
+    enhanced_url: str
     processing_time_ms: int
     enhancements_applied: list
     width: Optional[int] = None
     height: Optional[int] = None
-    message: Optional[str] = None
     error: Optional[str] = None
 
 
-class UploadResponse(BaseModel):
-    filename: str
-    path: str
-    size_bytes: int
-    url: str
-
-
 class AnalyzeResponse(BaseModel):
-    analysis: dict
+    width: int = 0
+    height: int = 0
+    megapixels: float = 0
+    aspect_ratio: str = ""
+    quality_score: int = 0
+    brightness: dict = {}
+    contrast: dict = {}
+    sharpness: dict = {}
+    colors: dict = {}
+    edges: dict = {}
+    background: dict = {}
+    suggested_category: str = ""
+    improvements: list = []
+    is_ecommerce_ready: bool = False
 
 
 # ---- Endpoints ----
+
 @router.post("/upload", response_model=UploadResponse)
 async def upload_image(file: UploadFile = File(...)):
-    """Upload a product image for processing."""
+    """Upload a product image. Returns the URL to access it."""
 
-    # Validate file type
-    allowed_types = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"}
-    if file.content_type not in allowed_types:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
-        )
+    allowed = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"}
+    if file.content_type not in allowed:
+        raise HTTPException(400, f"Invalid type. Allowed: {', '.join(allowed)}")
 
-    # Read and check size
     content = await file.read()
     if len(content) > MAX_UPLOAD_SIZE:
-        raise HTTPException(
-            status_code=413,
-            detail=f"File too large. Maximum size: {MAX_UPLOAD_SIZE // (1024*1024)}MB"
-        )
+        raise HTTPException(413, f"Too large. Max {MAX_UPLOAD_SIZE // (1024*1024)}MB")
 
-    # Save file
-    path = await image_service.save_upload(content, file.filename)
+    result = await image_service.save_upload(content, file.filename)
 
     return UploadResponse(
-        filename=Path(path).name,
-        path=path,
-        size_bytes=len(content),
-        url=f"/api/images/{Path(path).name}",
+        filename=result["filename"],
+        path=result["path"],
+        url=result["url"],
+        size_bytes=result["size_bytes"],
+        width=result["width"],
+        height=result["height"],
     )
 
 
 @router.post("/enhance", response_model=EnhanceResponse)
 async def enhance_image(request: EnhanceRequest):
-    """AI-enhance a product image."""
+    """Enhance an image (background removal, lighting, quality). Returns before/after URLs."""
 
     if not os.path.exists(request.image_path):
-        raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(404, "Image not found on disk")
 
     result = await image_service.enhance_image(
         image_path=request.image_path,
@@ -104,46 +111,29 @@ async def enhance_image(request: EnhanceRequest):
     return EnhanceResponse(**result)
 
 
-@router.post("/remove-bg", response_model=EnhanceResponse)
-async def remove_background(image_path: str = Body(...)):
-    """Remove background from an image (shortcut endpoint)."""
-
-    if not os.path.exists(image_path):
-        raise HTTPException(status_code=404, detail="Image not found")
-
-    result = await image_service.enhance_image(
-        image_path=image_path,
-        remove_bg=True,
-        improve_lighting=False,
-        enhance_quality=False,
-    )
-
-    return EnhanceResponse(**result)
-
-
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_image(image_path: str = Body(...)):
-    """AI analysis of a product image - suggests category, quality, improvements."""
+    """ML analysis of a product image. Returns quality scores, colors, suggestions."""
 
     if not os.path.exists(image_path):
-        raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(404, "Image not found on disk")
 
-    analysis = await image_service.analyze_image_with_ai(image_path)
-    return AnalyzeResponse(analysis=analysis)
+    result = image_service.analyze_image(image_path)
+    return AnalyzeResponse(**result)
 
 
 @router.get("/{filename}")
 async def serve_image(filename: str):
-    """Serve an uploaded or processed image."""
+    """Serve any uploaded or processed image by filename."""
 
-    # Check uploads directory
+    # Check uploads first
     upload_path = UPLOAD_DIR / filename
     if upload_path.exists():
         return FileResponse(str(upload_path))
 
-    # Check outputs directory
+    # Check outputs (enhanced images)
     output_path = OUTPUT_DIR / filename
     if output_path.exists():
         return FileResponse(str(output_path))
 
-    raise HTTPException(status_code=404, detail="Image not found")
+    raise HTTPException(404, "Image not found")

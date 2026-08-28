@@ -149,9 +149,7 @@ const API = {
         },
 
         async analyze(imagePath) {
-            const formData = new FormData();
-            formData.append('image_path', imagePath);
-            return API.request('POST', '/api/images/analyze', formData);
+            return API.post('/api/images/analyze', { image_path: imagePath });
         },
     },
 

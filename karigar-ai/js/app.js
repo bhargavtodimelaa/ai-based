@@ -485,29 +485,38 @@ const App = {
 
     handlePhotoUpload(event) {
         const file = event.target.files[0];
-        if (file) {
-            // Try API upload first
-            if (this._apiAvailable) {
-                API.images.upload(file).then(result => {
-                    this.productCreationFlow.photo = result.path;
-                    this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
+        if (!file) return;
+
+        if (this._apiAvailable) {
+            // Upload to backend, get real URL
+            API.images.upload(file).then(result => {
+                this.productCreationFlow.photo = result.path;
+                this.productCreationFlow.photoUrl = result.url;
+                // Run ML analysis
+                API.images.analyze(result.path).then(analysis => {
+                    this.productCreationFlow.analysis = analysis;
+                    this.showAIProcessing([I18N.t('analyzing'), 'Found ' + analysis.suggested_category, 'Quality: ' + analysis.quality_score + '/10'], () => this.renderAddStep(2));
                 }).catch(() => {
-                    // Fallback to local FileReader
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.productCreationFlow.photo = e.target.result;
-                        this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
-                    };
-                    reader.readAsDataURL(file);
+                    this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
                 });
-            } else {
+            }).catch(() => {
+                // Fallback to local FileReader
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     this.productCreationFlow.photo = e.target.result;
+                    this.productCreationFlow.photoUrl = e.target.result;
                     this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
                 };
                 reader.readAsDataURL(file);
-            }
+            });
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.productCreationFlow.photo = e.target.result;
+                this.productCreationFlow.photoUrl = e.target.result;
+                this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
+            };
+            reader.readAsDataURL(file);
         }
     },
 
@@ -522,18 +531,31 @@ const App = {
     renderAIStudio() {
         const el = document.getElementById('page-ai-image-studio');
         if (!el) return;
+        const photo = this.productCreationFlow.photo;
+        const photoUrl = this.productCreationFlow.photoUrl;
+        const analysis = this.productCreationFlow.analysis;
+        const hasRealPhoto = photo && photo !== 'demo' && photoUrl;
+        const imgSrc = hasRealPhoto ? (photoUrl.startsWith('/') ? window.location.origin + photoUrl : photoUrl) : '';
+
         el.innerHTML = `
             <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6)">
                 <button class="btn btn-icon btn-ghost" onclick="Navigation.back()">←</button>
                 <h1 class="text-h2">${I18N.t('aiStudio')}</h1>
             </div>
-            <div class="compare-slider" id="compare-slider">
-                <div class="compare-before"><div style="text-align:center"><div style="font-size:4rem;margin-bottom:var(--space-2)">🧶</div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold)">Before</div></div></div>
-                <div class="compare-after" id="compare-after"><div style="text-align:center"><div style="font-size:4rem;margin-bottom:var(--space-2)">✨🧶✨</div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold)">After</div></div></div>
+            <div class="compare-slider" id="compare-slider" style="background:var(--secondary)">
+                <div class="compare-before" id="compare-before">
+                    ${hasRealPhoto ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\"text-align:center\"><div style=\"font-size:4rem\">🧶</div><div>Before</div></div>'">` : '<div style="text-align:center"><div style="font-size:4rem">🧶</div><div>Before</div></div>'}
+                </div>
+                <div class="compare-after" id="compare-after">
+                    <div style="text-align:center"><div style="font-size:4rem;margin-bottom:var(--space-2)">✨</div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold)">After Enhancement</div></div>
+                </div>
                 <div class="compare-divider" id="compare-divider"></div>
                 <div class="compare-handle" id="compare-handle">⇔</div>
             </div>
             <p class="text-caption text-center mt-4 mb-4" style="color:var(--muted)">↔ Drag to compare before & after</p>
+
+            ${analysis ? this._renderAnalysisCard(analysis) : ''}
+
             <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-6);justify-content:center">
                 <button class="btn btn-outline btn-sm" onclick="this.classList.toggle('btn-primary')">✂️ ${I18N.t('removeBackground')}</button>
                 <button class="btn btn-outline btn-sm" onclick="this.classList.toggle('btn-primary')">💡 ${I18N.t('improveLighting')}</button>
@@ -544,6 +566,26 @@ const App = {
             <button class="btn btn-primary btn-lg btn-full" onclick="App.enhanceImage()">🤖 ${I18N.t('enhanceWithAI')}</button>
         `;
         this.initCompareSlider();
+    },
+
+    _renderAnalysisCard(a) {
+        const scoreColor = a.quality_score >= 7 ? 'var(--success)' : a.quality_score >= 5 ? 'var(--warning)' : 'var(--error)';
+        return `
+            <div class="card mb-6" style="padding:var(--space-5)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)">
+                    <h3 style="font-size:var(--text-body);font-weight:var(--weight-semibold)">🔍 ML Image Analysis</h3>
+                    <div style="width:48px;height:48px;border-radius:50%;background:${scoreColor};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:var(--weight-bold);font-size:var(--text-body)">${a.quality_score}/10</div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-bottom:var(--space-4)">
+                    <div style="text-align:center"><div style="font-size:var(--text-caption);color:var(--muted)">☀️ Brightness</div><div style="font-weight:var(--weight-semibold)">${a.brightness?.score || '-'}/10</div></div>
+                    <div style="text-align:center"><div style="font-size:var(--text-caption);color:var(--muted)">🎨 Contrast</div><div style="font-weight:var(--weight-semibold)">${a.contrast?.score || '-'}/10</div></div>
+                    <div style="text-align:center"><div style="font-size:var(--text-caption);color:var(--muted)">🔪 Sharpness</div><div style="font-weight:var(--weight-semibold)">${a.sharpness?.score || '-'}/10</div></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--muted);margin-bottom:var(--space-3)">📁 ${a.width}x${a.height} • ${a.aspect_ratio} • ${a.megapixels}MP</div>
+                ${a.suggested_category ? `<div style="margin-bottom:var(--space-3)"><span class="badge badge-primary">Suggested: ${a.suggested_category}</span></div>` : ''}
+                ${a.improvements?.length ? a.improvements.map(i => `<div style="font-size:var(--text-small);padding:var(--space-2) 0;border-top:1px solid var(--border-light)">💡 ${i.message}</div>`).join('') : ''}
+            </div>
+        `;
     },
 
     initCompareSlider() {
@@ -571,30 +613,34 @@ const App = {
 
     async enhanceImage() {
         const photo = this.productCreationFlow.photo;
-        // Try API enhance if we have a real uploaded file
+        // Try API enhance if we have a real uploaded file path
         if (this._apiAvailable && photo && photo !== 'demo' && !photo.startsWith('data:')) {
             try {
                 this.showAIProcessing([I18N.t('analyzing'), I18N.t('removingBg'), I18N.t('improvingLight'), I18N.t('preparingImage')], async () => {
                     const result = await API.images.enhance(photo);
                     this.productCreationFlow.enhanced = true;
                     this.productCreationFlow.photo = result.enhanced_path;
+                    this.productCreationFlow.photoUrl = result.enhanced_url;
+                    const enhancedSrc = window.location.origin + result.enhanced_url;
                     const after = document.getElementById('compare-after');
-                    if (after) after.innerHTML = `<div style="text-align:center"><div style="font-size:4rem;margin-bottom:var(--space-2)">✨🧶✨</div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold);color:#fff">Enhanced</div></div>`;
+                    if (after) after.innerHTML = `<img src="${enhancedSrc}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\"text-align:center\"><div style=\"font-size:4rem\">✨</div><div>Enhanced</div></div>'">`;
                     const cs = document.querySelector('.compare-slider');
                     if (cs) cs.style.boxShadow = '0 0 0 4px var(--success)';
-                    this.showToast('Image enhanced with AI!', 'success');
+                    this.showToast(`Enhanced in ${result.processing_time_ms}ms!`, 'success');
                 });
                 return;
-            } catch { /* fall through to mock */ }
+            } catch (e) {
+                console.warn('Enhance failed, using mock:', e);
+            }
         }
-        // Mock fallback
+        // Mock fallback (demo product or no API)
         this.showAIProcessing([I18N.t('analyzing'), I18N.t('removingBg'), I18N.t('improvingLight'), I18N.t('preparingImage')], () => {
             this.productCreationFlow.enhanced = true;
             const after = document.getElementById('compare-after');
             if (after) after.innerHTML = `<div style="text-align:center"><div style="font-size:4rem;margin-bottom:var(--space-2)">✨🧶✨</div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold);color:#fff">Enhanced</div></div>`;
             const cs = document.querySelector('.compare-slider');
             if (cs) cs.style.boxShadow = '0 0 0 4px var(--success)';
-            this.showToast('Image enhanced successfully!', 'success');
+            this.showToast('Image enhanced!', 'success');
         });
     },
 
