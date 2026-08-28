@@ -1,0 +1,151 @@
+/* ============================================
+   KarigarAI - CSS Custom Properties
+   ============================================ */
+
+:root {
+    /* ---- Colors ---- */
+    --primary: #0d7c5f;
+    --primary-light: #10a37f;
+    --primary-dark: #095e48;
+    --primary-50: rgba(13, 124, 95, 0.08);
+    --primary-100: rgba(13, 124, 95, 0.15);
+
+    --secondary: #fdf6ec;
+    --secondary-dark: #f5e6cc;
+
+    --accent: #e8842c;
+    --accent-light: #f0a050;
+    --accent-dark: #c96b1a;
+
+    --background: #f8f7f4;
+    --surface: #ffffff;
+    --surface-hover: #fafafa;
+    --surface-active: #f0f0f0;
+
+    --text: #1a1a2e;
+    --text-secondary: #555568;
+    --muted: #8e8ea0;
+    --border: #e5e5ea;
+    --border-light: #f0f0f5;
+
+    --success: #16a34a;
+    --success-bg: rgba(22, 163, 74, 0.1);
+    --warning: #d97706;
+    --warning-bg: rgba(217, 119, 6, 0.1);
+    --error: #dc2626;
+    --error-bg: rgba(220, 38, 38, 0.1);
+    --info: #2563eb;
+    --info-bg: rgba(37, 99, 235, 0.1);
+
+    /* ---- Typography ---- */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --text-display: 2.5rem;
+    --text-h1: 2rem;
+    --text-h2: 1.5rem;
+    --text-h3: 1.175rem;
+    --text-body: 1rem;
+    --text-small: 0.875rem;
+    --text-caption: 0.75rem;
+    --text-xs: 0.6875rem;
+
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.65;
+
+    /* ---- Spacing ---- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+
+    /* ---- Border Radius ---- */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* ---- Shadows ---- */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -4px rgba(0,0,0,0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.15);
+    --shadow-primary: 0 4px 14px rgba(13, 124, 95, 0.25);
+    --shadow-accent: 0 4px 14px rgba(232, 132, 44, 0.25);
+
+    /* ---- Transitions ---- */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ---- Z-Index ---- */
+    --z-nav: 100;
+    --z-sticky: 200;
+    --z-dropdown: 300;
+    --z-overlay: 400;
+    --z-modal: 500;
+    --z-toast: 600;
+    --z-fab: 350;
+
+    /* ---- Layout ---- */
+    --sidebar-width: 260px;
+    --header-height: 64px;
+    --bottom-nav-height: 64px;
+    --max-content-width: 1400px;
+    --content-padding: 1.25rem;
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+[data-theme="dark"] {
+    --primary: #10a37f;
+    --primary-light: #34d399;
+    --primary-dark: #0d7c5f;
+    --primary-50: rgba(16, 163, 127, 0.12);
+    --primary-100: rgba(16, 163, 127, 0.2);
+
+    --secondary: #1a1a2e;
+    --secondary-dark: #252540;
+
+    --accent: #f0a050;
+    --accent-light: #f5bc7a;
+    --accent-dark: #e8842c;
+
+    --background: #0f0f1a;
+    --surface: #1a1a2e;
+    --surface-hover: #222240;
+    --surface-active: #2a2a4a;
+
+    --text: #eaeaf0;
+    --text-secondary: #b0b0c0;
+    --muted: #7a7a90;
+    --border: #2a2a40;
+    --border-light: #222238;
+
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.35);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.4);
+    --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.5);
+}

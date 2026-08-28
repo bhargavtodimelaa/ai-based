@@ -1,0 +1,263 @@
+/* ============================================
+   KarigarAI - Responsive Styles
+   ============================================ */
+
+/* ---- Mobile First (default: < 768px) ---- */
+.sidebar {
+    transform: translateX(-100%);
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.main-content {
+    margin-left: 0;
+    padding-bottom: calc(var(--bottom-nav-height) + 16px);
+}
+
+.bottom-nav {
+    display: flex;
+}
+
+.fab {
+    bottom: calc(var(--bottom-nav-height) + 16px);
+}
+
+.product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.marketplace-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.landing-hero-content {
+    padding: var(--space-4) 0;
+}
+
+.steps {
+    flex-wrap: wrap;
+}
+
+.step {
+    min-width: 70px;
+}
+
+.btn-lg {
+    padding: var(--space-4) var(--space-6);
+    font-size: 1rem;
+}
+
+.toast-container {
+    left: var(--space-4);
+    right: var(--space-4);
+}
+
+.toast {
+    min-width: auto;
+    max-width: 100%;
+}
+
+.chat-panel {
+    max-width: 100%;
+    bottom: calc(var(--bottom-nav-height));
+    border-radius: 0;
+    height: calc(100vh - var(--bottom-nav-height));
+}
+
+/* ---- Small phones (360px-375px) ---- */
+@media (min-width: 360px) {
+    .product-grid,
+    .marketplace-grid {
+        gap: var(--space-3);
+    }
+}
+
+/* ---- Medium phones (390px-430px) ---- */
+@media (min-width: 390px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ---- Large phones (430px+) ---- */
+@media (min-width: 430px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .marketplace-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ---- Tablets (768px+) ---- */
+@media (min-width: 768px) {
+    .sidebar {
+        transform: translateX(0);
+        position: fixed;
+    }
+
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding-bottom: var(--space-8);
+    }
+
+    .bottom-nav {
+        display: none;
+    }
+
+    .fab {
+        bottom: 32px;
+        right: 32px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+    }
+
+    .marketplace-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-5);
+    }
+
+    .page {
+        padding: var(--space-6);
+    }
+
+    .chat-panel {
+        bottom: 0;
+        right: 0;
+        height: 70vh;
+        border-radius: var(--radius-2xl) 0 0 0;
+    }
+
+    .modal-content {
+        border-radius: var(--radius-2xl);
+        margin-bottom: 0;
+    }
+
+    .modal-overlay {
+        align-items: center;
+    }
+
+    .landing-hero-content {
+        flex-direction: row;
+        text-align: left;
+        gap: var(--space-12);
+        padding: var(--space-12) 0;
+    }
+
+    .landing-hero-text {
+        flex: 1;
+    }
+
+    .landing-hero-visual {
+        flex: 1;
+    }
+
+    .workflow-visual {
+        margin-top: 0;
+    }
+
+    .stats-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ---- Desktop (1024px+) ---- */
+@media (min-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .marketplace-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .page {
+        padding: var(--space-8);
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: var(--space-6);
+    }
+
+    .dashboard-main { }
+    .dashboard-sidebar-panel { }
+
+    .landing-hero-content {
+        padding: var(--space-16) 0;
+    }
+}
+
+/* ---- Large Desktop (1280px+) ---- */
+@media (min-width: 1280px) {
+    .product-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .marketplace-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ---- Touch-friendly overrides ---- */
+@media (pointer: coarse) {
+    .btn {
+        min-height: 48px;
+    }
+
+    .chip {
+        min-height: 40px;
+    }
+
+    .sidebar-item {
+        padding: var(--space-4);
+    }
+
+    .tab {
+        min-height: 44px;
+        padding: var(--space-3) var(--space-5);
+    }
+}
+
+/* ---- Reduced Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ---- Print ---- */
+@media print {
+    .sidebar, .bottom-nav, .fab, .chat-panel, .toast-container {
+        display: none !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+    }
+}

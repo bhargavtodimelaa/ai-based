@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="KarigarAI - Your AI-powered business manager for artisans">
+    <meta name="theme-color" content="#0d7c5f">
+    <title>KarigarAI — Your AI-powered Business Manager</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+</head>
+<body>
+
+    <!-- ============================================
+         LANDING PAGE
+         ============================================ -->
+    <div id="page-landing" class="page">
+        <div class="landing-hero">
+            <nav class="landing-nav">
+                <div style="display:flex;align-items:center;gap:var(--space-3)">
+                    <div class="sidebar-logo-icon">🏺</div>
+                    <span style="font-size:var(--text-h3);font-weight:var(--weight-bold)">Karigar<span style="color:var(--primary)">AI</span></span>
+                </div>
+                <div style="display:flex;gap:var(--space-2)">
+                    <button class="lang-btn active" data-lang="en" onclick="App.setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="hi" onclick="App.setLanguage('hi')">हि</button>
+                    <button class="lang-btn" data-lang="te" onclick="App.setLanguage('te')">తె</button>
+                </div>
+            </nav>
+
+            <div class="landing-hero-content">
+                <div class="landing-hero-text">
+                    <div class="landing-hero-badge">✨ AI-Powered Platform</div>
+                    <h1 class="landing-hero-title" data-i18n="landingTitle">Turn your craft into a digital business</h1>
+                    <p class="landing-hero-subtitle" data-i18n="landingSubtitle">KarigarAI helps artisans create professional product listings, discover the right price, and reach buyers online.</p>
+                    <div class="landing-hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="goToLogin()" data-i18n="startSelling">Start Selling</button>
+                        <button class="btn btn-outline btn-lg" onclick="document.querySelector('.workflow-visual').scrollIntoView({behavior:'smooth'})" data-i18n="seeHowItWorks">See How It Works</button>
+                    </div>
+                </div>
+
+                <div class="landing-hero-visual">
+                    <div class="workflow-visual">
+                        <div class="workflow-step animate-fadeInUp stagger-1" style="opacity:0;animation-fill-mode:forwards">
+                            <div class="workflow-step-icon" style="background:var(--primary-50);color:var(--primary)">📸</div>
+                            <div class="workflow-step-text">Product Photo</div>
+                        </div>
+                        <div class="workflow-arrow">↓</div>
+                        <div class="workflow-step animate-fadeInUp stagger-2" style="opacity:0;animation-fill-mode:forwards">
+                            <div class="workflow-step-icon" style="background:var(--info-bg);color:var(--info)">🤖</div>
+                            <div class="workflow-step-text">AI Enhancement</div>
+                        </div>
+                        <div class="workflow-arrow">↓</div>
+                        <div class="workflow-step animate-fadeInUp stagger-3" style="opacity:0;animation-fill-mode:forwards">
+                            <div class="workflow-step-icon" style="background:rgba(232,132,44,0.1);color:var(--accent)">📝</div>
+                            <div class="workflow-step-text">AI Listing</div>
+                        </div>
+                        <div class="workflow-arrow">↓</div>
+                        <div class="workflow-step animate-fadeInUp stagger-4" style="opacity:0;animation-fill-mode:forwards">
+                            <div class="workflow-step-icon" style="background:var(--warning-bg);color:var(--warning)">💰</div>
+                            <div class="workflow-step-text">AI Price</div>
+                        </div>
+                        <div class="workflow-arrow">↓</div>
+                        <div class="workflow-step animate-fadeInUp stagger-5" style="opacity:0;animation-fill-mode:forwards">
+                            <div class="workflow-step-icon" style="background:var(--success-bg);color:var(--success)">🏪</div>
+                            <div class="workflow-step-text">Digital Marketplace</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         LOGIN PAGE
+         ============================================ -->
+    <div id="page-login" class="page">
+        <div style="max-width:420px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:var(--space-8) var(--space-4)">
+            <div style="text-align:center;margin-bottom:var(--space-10)">
+                <div class="sidebar-logo-icon" style="width:64px;height:64px;font-size:2rem;margin:0 auto var(--space-4)">🏺</div>
+                <h1 style="font-size:var(--text-display)">Welcome back 👋</h1>
+                <p class="text-muted mt-2" style="font-size:var(--text-h3)">Let's grow your business.</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone number</label>
+                <input class="form-input" type="tel" placeholder="+91 98765 43210" value="+91 98765 43210">
+            </div>
+            <button class="btn btn-primary btn-lg btn-full mb-4" onclick="demoLogin()">Continue</button>
+            <button class="btn btn-outline btn-full" onclick="demoLogin()">Continue as Demo Artisan</button>
+            <div style="text-align:center;margin-top:var(--space-8)">
+                <button class="btn btn-ghost" onclick="Navigation.navigate('landing')">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         APP LAYOUT (Sidebar + Main)
+         ============================================ -->
+    <div class="app-layout" style="display:none">
+        <!-- Sidebar (Desktop) -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">🏺</div>
+                <div class="sidebar-logo-text">Karigar<span>AI</span></div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-item active" data-page="dashboard"><span class="sidebar-item-icon">🏠</span><span>Home</span></div>
+                <div class="sidebar-item" data-page="products"><span class="sidebar-item-icon">📦</span><span>Products</span></div>
+                <div class="sidebar-item" data-page="add-product"><span class="sidebar-item-icon">➕</span><span>Add Product</span></div>
+                <div class="sidebar-item" data-page="orders"><span class="sidebar-item-icon">📋</span><span>Orders</span></div>
+                <div class="sidebar-item" data-page="marketplace"><span class="sidebar-item-icon">🏪</span><span>Marketplace</span></div>
+                <div class="sidebar-item" onclick="toggleChatPanel()"><span class="sidebar-item-icon">🤖</span><span>AI Assistant</span></div>
+                <div class="sidebar-item" data-page="profile"><span class="sidebar-item-icon">👤</span><span>Profile</span></div>
+            </nav>
+            <div class="sidebar-footer">
+                <div style="display:flex;align-items:center;gap:var(--space-3)">
+                    <div class="avatar avatar-sm">B</div>
+                    <div><div style="font-size:var(--text-small);font-weight:var(--weight-semibold)">Bhargav</div><div style="font-size:var(--text-caption);color:var(--muted)">Artisan</div></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div id="page-dashboard" class="page active"></div>
+            <div id="page-products" class="page"></div>
+            <div id="page-add-product" class="page"></div>
+            <div id="page-ai-image-studio" class="page"></div>
+            <div id="page-voice-cataloger" class="page"></div>
+            <div id="page-ai-listing" class="page"></div>
+            <div id="page-ai-pricing" class="page"></div>
+            <div id="page-product-preview" class="page"></div>
+            <div id="page-success" class="page"></div>
+            <div id="page-marketplace" class="page"></div>
+            <div id="page-orders" class="page"></div>
+            <div id="page-order-details" class="page"></div>
+            <div id="page-profile" class="page"></div>
+        </main>
+    </div>
+
+    <!-- ============================================
+         BOTTOM NAVIGATION (Mobile)
+         ============================================ -->
+    <nav class="bottom-nav" style="display:none">
+        <button class="bottom-nav-item active" data-page="dashboard"><span class="bottom-nav-item-icon">🏠</span><span>Home</span></button>
+        <button class="bottom-nav-item" data-page="products"><span class="bottom-nav-item-icon">📦</span><span>Products</span></button>
+        <button class="bottom-nav-item bottom-nav-item-add" data-page="add-product"><span class="bottom-nav-item-icon">➕</span></button>
+        <button class="bottom-nav-item" data-page="orders"><span class="bottom-nav-item-icon">📋</span><span>Orders</span></button>
+        <button class="bottom-nav-item" data-page="profile"><span class="bottom-nav-item-icon">👤</span><span>Profile</span></button>
+    </nav>
+
+    <!-- ============================================
+         FLOATING ACTION BUTTONS
+         ============================================ -->
+    <button class="fab" onclick="Navigation.navigate('add-product')" style="display:none" title="Add Product">➕</button>
+    <button class="ai-fab fab" onclick="toggleChatPanel()" style="display:none;bottom:var(--bottom-nav-height);background:var(--accent);box-shadow:var(--shadow-accent)" title="AI Assistant">🤖</button>
+
+    <!-- ============================================
+         AI CHAT PANEL
+         ============================================ -->
+    <div id="chat-panel" class="chat-panel">
+        <div class="chat-header">
+            <div style="display:flex;align-items:center;gap:var(--space-3)">
+                <div style="width:40px;height:40px;border-radius:var(--radius-lg);background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem">🤖</div>
+                <div><h3 style="font-size:var(--text-body);font-weight:var(--weight-semibold)">AI Business Assistant</h3><p style="font-size:var(--text-caption);color:var(--success)">● Online</p></div>
+            </div>
+            <button class="btn btn-icon btn-ghost" onclick="toggleChatPanel()">✕</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-bubble chat-bubble-ai">👋 Hi! I'm your AI Business Assistant. I can help you improve your listings, pricing, and more.</div>
+        </div>
+        <div class="chat-suggestions" id="chat-suggestions">
+            <button class="chat-suggestion" onclick="handleChatSuggestion('How can I improve my product photos?')">📸 Improve photos</button>
+            <button class="chat-suggestion" onclick="handleChatSuggestion('What price should I set for my products?')">💰 Pricing advice</button>
+            <button class="chat-suggestion" onclick="handleChatSuggestion('Help me write better product descriptions')">✍️ Better descriptions</button>
+            <button class="chat-suggestion" onclick="handleChatSuggestion('Show me my recent orders')">📋 Recent orders</button>
+        </div>
+        <div class="chat-input-area">
+            <input class="chat-input" id="chat-input" type="text" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter')sendChatMessage()">
+            <button class="btn btn-primary" style="border-radius:var(--radius-full);min-height:44px;width:44px;padding:0" onclick="sendChatMessage()">→</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- ============================================
+         SCRIPTS (order matters!)
+         ============================================ -->
+    <script src="js/mock-data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/localization.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

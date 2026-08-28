@@ -1,0 +1,33 @@
+# ============================================
+# KarigarAI - Render Deployment Configuration
+# ============================================
+# This deploys the full-stack app: FastAPI backend + static frontend
+
+services:
+  - type: web
+    name: karigar-ai
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r backend/requirements.txt
+    startCommand: |
+      cd backend && python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: DEBUG
+        value: "false"
+      - key: APP_NAME
+        value: "KarigarAI"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: PORT
+        sync: false
+      - key: DATABASE_URL
+        value: "sqlite:///./karigarai.db"
+      - key: CORS_ORIGINS
+        value: '["*"]'
+      - key: SECRET_KEY
+        generateValue: true
+    healthCheckPath: /health
+    autoDeploy: true
