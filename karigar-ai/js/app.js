@@ -492,12 +492,12 @@ const App = {
             API.images.upload(file).then(result => {
                 this.productCreationFlow.photo = result.path;
                 this.productCreationFlow.photoUrl = result.url;
-                // Run ML analysis
+                // Run ML analysis, then show photo in AI Studio
                 API.images.analyze(result.path).then(analysis => {
                     this.productCreationFlow.analysis = analysis;
-                    this.showAIProcessing([I18N.t('analyzing'), 'Found ' + analysis.suggested_category, 'Quality: ' + analysis.quality_score + '/10'], () => this.renderAddStep(2));
+                    this.showAIProcessing([I18N.t('analyzing'), 'Found ' + analysis.suggested_category, 'Quality: ' + analysis.quality_score + '/10'], () => Navigation.navigate('ai-image-studio'));
                 }).catch(() => {
-                    this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
+                    this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => Navigation.navigate('ai-image-studio'));
                 });
             }).catch(() => {
                 // Fallback to local FileReader
@@ -505,7 +505,7 @@ const App = {
                 reader.onload = (e) => {
                     this.productCreationFlow.photo = e.target.result;
                     this.productCreationFlow.photoUrl = e.target.result;
-                    this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
+                    this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => Navigation.navigate('ai-image-studio'));
                 };
                 reader.readAsDataURL(file);
             });
@@ -514,7 +514,7 @@ const App = {
             reader.onload = (e) => {
                 this.productCreationFlow.photo = e.target.result;
                 this.productCreationFlow.photoUrl = e.target.result;
-                this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => this.renderAddStep(2));
+                this.showAIProcessing([I18N.t('analyzing'), I18N.t('preparingImage')], () => Navigation.navigate('ai-image-studio'));
             };
             reader.readAsDataURL(file);
         }
