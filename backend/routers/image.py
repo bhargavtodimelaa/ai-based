@@ -1,15 +1,11 @@
 """
-KarigarAI - Image Router (v2)
+KarigarAI - Image Router (v3 - fixed)
 
-Endpoints:
-- POST /api/images/upload         - Upload image → returns URL
-- POST /api/images/enhance        - Enhance image → returns before/after URLs
-- POST /api/images/analyze        - ML analysis → returns scores & suggestions
-- GET  /api/images/{filename}     - Serve any image file
+Uses Pydantic models for ALL request bodies to avoid 422 errors.
 """
 
 import os
-from fastapi import APIRouter, UploadFile, File, HTTPException, Body
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from pathlib import Path
 from typing import Optional
@@ -24,12 +20,16 @@ OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "./outputs"))
 MAX_UPLOAD_SIZE = int(os.getenv("MAX_UPLOAD_SIZE_MB", "10")) * 1024 * 1024
 
 
-# ---- Schemas ----
+# ---- Request/Response Models ----
 class EnhanceRequest(BaseModel):
     image_path: str
     remove_bg: bool = True
     improve_lighting: bool = True
     enhance_quality: bool = True
+
+
+class AnalyzeRequest(BaseModel):
+    image_path: str
 
 
 class UploadResponse(BaseModel):
@@ -73,7 +73,6 @@ class AnalyzeResponse(BaseModel):
 @router.post("/upload", response_model=UploadResponse)
 async def upload_image(file: UploadFile = File(...)):
     """Upload a product image. Returns the URL to access it."""
-
     allowed = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"}
     if file.content_type not in allowed:
         raise HTTPException(400, f"Invalid type. Allowed: {', '.join(allowed)}")
@@ -96,8 +95,7 @@ async def upload_image(file: UploadFile = File(...)):
 
 @router.post("/enhance", response_model=EnhanceResponse)
 async def enhance_image(request: EnhanceRequest):
-    """Enhance an image (background removal, lighting, quality). Returns before/after URLs."""
-
+    """Enhance an image. Returns before/after URLs."""
     if not os.path.exists(request.image_path):
         raise HTTPException(404, "Image not found on disk")
 
@@ -107,31 +105,26 @@ async def enhance_image(request: EnhanceRequest):
         improve_lighting=request.improve_lighting,
         enhance_quality=request.enhance_quality,
     )
-
     return EnhanceResponse(**result)
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_image(image_path: str = Body(...)):
+async def analyze_image(request: AnalyzeRequest):
     """ML analysis of a product image. Returns quality scores, colors, suggestions."""
-
-    if not os.path.exists(image_path):
+    if not os.path.exists(request.image_path):
         raise HTTPException(404, "Image not found on disk")
 
-    result = image_service.analyze_image(image_path)
+    result = image_service.analyze_image(request.image_path)
     return AnalyzeResponse(**result)
 
 
 @router.get("/{filename}")
 async def serve_image(filename: str):
     """Serve any uploaded or processed image by filename."""
-
-    # Check uploads first
     upload_path = UPLOAD_DIR / filename
     if upload_path.exists():
         return FileResponse(str(upload_path))
 
-    # Check outputs (enhanced images)
     output_path = OUTPUT_DIR / filename
     if output_path.exists():
         return FileResponse(str(output_path))
